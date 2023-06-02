@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build and Deploy
 
 on:
   push:
@@ -26,3 +26,56 @@ jobs:
 
       - name: Build iOS
         run: npx react-native run-ios --configuration=Release
+
+  deploy_android:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Android SDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+
+      - name: Build APK
+        run: npx react-native run-android --variant=release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+  deploy_ios:
+    needs: build
+    runs-on: macOS-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build iOS IPA
+        run: npx react-native run-ios --configuration=Release --device
+
+      - name: Archive the app
+        run: xcodebuild -workspace YourApp.xcworkspace -scheme YourApp -configuration Release -archivePath YourApp.xcarchive clean archive -allowProvisioningUpdates
+
+      - name: Export the app as IPA
+        run: xcodebuild -exportArchive -archivePath YourApp.xcarchive -exportOptionsPlist exportOptions.plist -exportPath ./build
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: build/YourApp.ipa
