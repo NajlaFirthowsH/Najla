@@ -33,7 +33,7 @@ const Drawnav = () => {
                 <Drawer.Navigator initialRouteName='Network'>
                     <Drawer.Screen name='Hello' component={Hello}/>
                     <Drawer.Screen name='Tabnav' component={Tabnav} options={{headerShown:false}}/>
-                    <Drawer.Screen name='Login' component={Login} options={{headerShown:false}}/>
+                    {/* <Drawer.Screen name='Login' component={Login} options={{headerShown:false}}/> */}
                         </Drawer.Navigator>
              </NavigationContainer>
 {/*}
